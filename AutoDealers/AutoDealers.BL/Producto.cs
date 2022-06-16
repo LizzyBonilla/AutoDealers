@@ -21,7 +21,7 @@ namespace AutoDealers.BL
         public string Color { get; set; }
         public double Precio { get; set; }
         public int Existencia { get; set; }
-       //public Categoria Categoria { get; set; }
+        public Categoria Categoria { get; set; }
         public bool Activo { get; set; }
 
     }
