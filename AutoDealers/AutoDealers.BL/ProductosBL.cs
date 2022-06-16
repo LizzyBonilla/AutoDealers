@@ -24,5 +24,42 @@ namespace AutoDealers.BL
             ListadeProductos = _contexto.Productos.ToList();
             return ListadeProductos;
         }
+
+        public void GuardarProducto(Producto producto)
+        {
+            if (producto.Id == 0)
+            {
+                _contexto.Productos.Add(producto);
+            }
+            else
+            {
+                var productoExistente = _contexto.Productos.Find(producto.Id);
+                productoExistente.Descripcion = producto.Descripcion;
+                productoExistente.Modelo = producto.Modelo;
+                productoExistente.Color = producto.Color;
+                productoExistente.Precio = producto.Precio;
+                productoExistente.Existencia = producto.Existencia;
+
+
+            } 
+            
+            _contexto.SaveChanges();
+
+        }
+
+        public Producto ObtenerProductos (int id)
+        {
+
+            var producto = _contexto.Productos.Find(id);
+            return producto;
+        }
+
+        public void EliminarProducto (int id)
+        {
+            var producto = _contexto.Productos.Find(id);
+
+            _contexto.Productos.Remove(producto);
+            _contexto.SaveChanges();
+        }
     }
 }

@@ -59,7 +59,7 @@
             // 
             // listadeProductosBindingSource
             // 
-            this.listadeProductosBindingSource.DataSource = typeof(AutoDealers.BL.Producto);
+            this.listadeProductosBindingSource.DataSource = typeof(AutoDealers.BL.Categoria);
             this.listadeProductosBindingSource.CurrentChanged += new System.EventHandler(this.listadeProductosBindingSource_CurrentChanged);
             // 
             // listadeProductosBindingNavigator
