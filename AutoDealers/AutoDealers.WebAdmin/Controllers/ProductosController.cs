@@ -11,10 +11,12 @@ namespace AutoDealers.WebAdmin.Controllers
     {
 
         ProductosBL _productosBL;
+        CategoriasBL _categoriasBL;
 
         public ProductosController()
         {
             _productosBL = new ProductosBL();
+            _categoriasBL = new CategoriasBL();
         }
 
         // GET: Productos
@@ -29,32 +31,71 @@ namespace AutoDealers.WebAdmin.Controllers
         public ActionResult Crear ()
         {
             var nuevoProducto = new Producto();
+            var categorias = _categoriasBL.ObtenerCategorias();
 
+            ViewBag.CategoriaId= 
+                new SelectList(categorias, "Id", "Descripcion");
             return View(nuevoProducto);
         }
 
         [HttpPost] //El usuario nos envia de regreso
-        public ActionResult Crear(Producto producto)
+        public ActionResult Crear(Producto producto, HttpPostedFileBase imagen)
         {
-            _productosBL.GuardarProducto(producto);
+            if (ModelState.IsValid)
+            {
+                if (producto.CategoriaId == 0)
+                {
+                    ModelState.AddModelError("CategoriaId", "Ingrese la categoria");
+                    return View(producto);
+                }
+                if (imagen != null)
+                {
+                    producto.UrlImagen = GuardarImagen(imagen);
+                }
+                    _productosBL.GuardarProducto(producto);
 
             return RedirectToAction("Index");
+        }
+            var categorias = _categoriasBL.ObtenerCategorias();
+
+            ViewBag.CategoriaId =
+                new SelectList(categorias, "Id", "Descripcion");
+           
+            return View(producto);
         }
 
         public ActionResult Editar(int id)
         {
 
             var producto = _productosBL.ObtenerProductos(id);
+            var categorias = _categoriasBL.ObtenerCategorias();
+
+            ViewBag.CategoriaId = new SelectList(categorias, "Id", "Descripcion", producto.CategoriaId);
             return View(producto);
         }
 
         [HttpPost]
         public ActionResult Editar (Producto producto)
         {
-            _productosBL.GuardarProducto(producto);
+            if (ModelState.IsValid)
+            {
+                if (producto.CategoriaId == 0)
+                {
+                    ModelState.AddModelError("CategoriaId", "Ingrese la categoria");
+                    return View(producto);
+                }
+                _productosBL.GuardarProducto(producto);
 
-            return RedirectToAction("Index");
+                return RedirectToAction("Index");
+            }
+            var categorias = _categoriasBL.ObtenerCategorias();
+
+            ViewBag.CategoriaId =
+                new SelectList(categorias, "Id", "Descripcion");
+
+            return View(producto);
         }
+    
 
         public ActionResult Detalle (int id)
         {
@@ -73,6 +114,13 @@ namespace AutoDealers.WebAdmin.Controllers
         {
             _productosBL.EliminarProducto(producto.Id);
             return RedirectToAction("Index");
+        }
+        private string GuardarImagen(HttpPostedFileBase imagen)
+        {
+            string path = Server.MapPath("~/Imagenes/" + imagen.FileName);
+            imagen.SaveAs(path);
+
+            return "/Imagenes/" + imagen.FileName;
         }
     }
 
