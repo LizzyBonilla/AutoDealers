@@ -18,12 +18,13 @@ namespace AutoDealers.WebAdmin.Controllers
             _productosBL = new ProductosBL();
         }
 
-        // GET: OrdenDetalle
+        // GET: OrdenesDetalle
         public ActionResult Index(int id)
         {
-            var orden = _ordenBL.ObtenerOrdenes(id);
+            var orden = _ordenBL.ObtenerOrden(id);
+            orden.ListadeOrdenDetalle = _ordenBL.ObtenerOrdenDetalle(id);
 
-            return View();
+            return View(orden);
         }
 
         public ActionResult Crear(int id)
@@ -31,7 +32,7 @@ namespace AutoDealers.WebAdmin.Controllers
             var nuevaOrdenDetalle = new OrdenDetalle();
             nuevaOrdenDetalle.OrdenId = id;
 
-            var productos = _productosBL.ObtenerProductos();
+            var productos = _productosBL.ObtenerProductosActivos();
             ViewBag.ProductoId = new SelectList(productos, "Id", "Descripcion");
 
             return View(nuevaOrdenDetalle);
@@ -44,22 +45,33 @@ namespace AutoDealers.WebAdmin.Controllers
             {
                 if (ordenDetalle.ProductoId == 0)
                 {
-                    ModelState.AddModelError("ProductoId", "Selecione un Producto");
+                    ModelState.AddModelError("ProductoId", "Seleccione un producto");
                     return View(ordenDetalle);
                 }
 
                 _ordenBL.GuardarOrdenDetalle(ordenDetalle);
-                return RedirectToAction("Index", new { Id = ordenDetalle.OrdenId });
+                return RedirectToAction("Index", new { id = ordenDetalle.OrdenId });
             }
 
-            
-
-            var productos = _productosBL.ObtenerProductos();
-
+            var productos = _productosBL.ObtenerProductosActivos();
             ViewBag.ProductoId = new SelectList(productos, "Id", "Descripcion");
-            return View(ordenDetalle);
 
+            return View(ordenDetalle);
         }
-       
+
+        public ActionResult Eliminar(int id)
+        {
+            var ordenDetalle = _ordenBL.ObtenerOrdenDetallePorId(id);
+
+            return View(ordenDetalle);
+        }
+
+        [HttpPost]
+        public ActionResult Eliminar(OrdenDetalle ordenDetalle)
+        {
+            _ordenBL.EliminarOrdenDetalle(ordenDetalle.Id);
+
+            return RedirectToAction("Index", new { id = ordenDetalle.OrdenId });
+        }
     }
 }
